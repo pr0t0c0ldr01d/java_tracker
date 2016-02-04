@@ -13,7 +13,7 @@ import time
 #computers = "java_index.txt"
 computers = "batch.txt"
 file_to_copy = "usagetracker.properties"
-username = ""
+username = input("Username:")
 password = getpass.getpass(stream=sys.stdout)
 
 #Define functions
@@ -71,7 +71,7 @@ def wnet_disconnect(host):
 
 with open(computers) as f:
     for line in f:
-        host,version = line.split()
+        host = line.rstrip()
         try:
             wnet_connect(host=host,username=username,password=password)
         except Exception as err:
@@ -81,19 +81,33 @@ with open(computers) as f:
         remote_dir_64 = "\\\\" + host + "\\c$\Program Files\\Java\\"
         if os.path.exists(remote_dir_32):
             for name in os.listdir(remote_dir_32):
+                if os.path.isfile(remote_dir_32 + "\\" + name):
+                    continue
                 destination = remote_dir_32 + name + "\\lib\\management"
-                print (host,destination)
+                destinationfile = destination + "\\" + file_to_copy
                 #result = netcopy(host=host, source=file_to_copy, dest_dir=destination, username=username, password=password, move=False)
                 if not os.path.exists(destination):
                     os.makedirs(destination)
-                shutil.copy(file_to_copy, destination)
+                if os.path.exists(destinationfile):
+                    print (destinationfile + ": File exists")
+                else:
+                    shutil.copy(file_to_copy, destination)
+                    if os.path.exists(destinationfile):
+                        print (destinationfile + ": File copied successfully")
         if os.path.exists(remote_dir_64):
             for name in os.listdir(remote_dir_64):
+                if os.path.isfile(remote_dir_32 + "\\" + name):
+                    continue
                 destination = remote_dir_64 + name + "\\lib\\management"
-                print (host,destination)
+                destinationfile = destination + "\\" + file_to_copy
                 if not os.path.exists(destination):
                     os.makedirs(destination)
-                shutil.copy(file_to_copy, destination)
+                if os.path.exists(destinationfile):
+                    print (destinationfile + ": File exists")
+                else:
+                    shutil.copy(file_to_copy, destination)
+                    if os.path.exists(destination + "\\" + file_to_copy):
+                        print (destinationfile + ": File copied successfully")
 
 
         wnet_disconnect(host)
