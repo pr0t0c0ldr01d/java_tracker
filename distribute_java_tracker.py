@@ -13,7 +13,7 @@ import time
 #computers = "java_index.txt"
 computers = "batch.txt"
 file_to_copy = "usagetracker.properties"
-username = "ACADIAN\svc_scripts"
+username = ""
 password = getpass.getpass(stream=sys.stdout)
 
 #Define functions
