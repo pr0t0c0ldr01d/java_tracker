@@ -4,6 +4,7 @@ import shutil
 import sys
 import win32wnet
 import getpass
+import time
 
 
 #Set up variables
@@ -78,3 +79,4 @@ with open(computers) as f:
         distribute(remote_dir_64,file_to_copy)
 
         wnet_disconnect(host)
+        time.sleep(1)
