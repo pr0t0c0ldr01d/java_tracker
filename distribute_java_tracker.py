@@ -2,49 +2,19 @@ import os
 import os.path
 import shutil
 import sys
-import pywin
-import pywin32_system32
 import win32wnet
-import re
 import getpass
-import time
+
 
 #Set up variables
-#computers = "java_index.txt"
 computers = "batch.txt"
 file_to_copy = "usagetracker.properties"
-username = input("Username:")
-password = getpass.getpass(stream=sys.stdout)
+
 
 #Define functions
 def convert_unc(host, path):
     """ Convert a file path on a host to a UNC path."""
     return ''.join(['\\\\', host, '\\', path.replace(':', '$')])
-
-def netcopy(host, source, dest_dir, username=None, password=None, move=False):
-    """ Copies files or directories to a remote computer. """
-
-    #wnet_connect(host, username, password)
-
-    dest_dir = convert_unc(host, dest_dir)
-
-    # Pad a backslash to the destination directory if not provided.
-    if not dest_dir[len(dest_dir) - 1] == '\\':
-        dest_dir = ''.join([dest_dir, '\\'])
-
-    # Create the destination dir if its not there.
-    if not os.path.exists(dest_dir):
-        os.makedirs(dest_dir)
-    else:
-    # Create a directory anyway if file exists so as to raise an error.
-        if not os.path.isdir(dest_dir):
-            os.makedirs(dest_dir)
-
-    if move:
-        return shutil.move(source, dest_dir)
-    else:
-        return shutil.copy(source, dest_dir)
-
 
 
 def wnet_connect(host, username, password):
@@ -66,6 +36,10 @@ def wnet_disconnect(host):
 
 
 def distribute(remote_dir,filename):
+#This function actually does all the magic of the program. It iterates over all Java subdirectories and drops the
+#usagetracker file in the right place. If that place does not exist or if the file exists already, or if there is some
+#regular file in there which doesn't belong, it handles that by skipping the cruft and creating directories as needed.
+#It verifies the copy and prints an insightful, one-line message for each action taken.
     if os.path.exists(remote_dir):
             for name in os.listdir(remote_dir):
                 if os.path.isfile(remote_dir + name):
@@ -82,6 +56,13 @@ def distribute(remote_dir,filename):
                     shutil.copy(filename, destination)
                     if os.path.exists(destinationfile):
                         print (destinationfile + ": File copied successfully")
+
+#Gather username and password the Python way
+username = input("Username:")
+password = getpass.getpass(stream=sys.stdout)
+
+#This is the main program. It iterates over all the computers in the supplied file, connects to each, distributes
+#the file, then closes the connection.
 
 with open(computers) as f:
     for line in f:
