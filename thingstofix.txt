@@ -1,0 +1,10 @@
+Need to process options, need option to verify copy. Probably should verify right after copy and print result, also md5sum to check no corruption
+
+Need to build in verify or "scan only" option.
+
+Need to handle case where file is found in Java directory...skip
+
+Need input file to be hosts only. Need to input deduplicated hosts
+
+Perhaps build in functionality to query nexpose API for list of affected hosts, or get it from active directory
+
