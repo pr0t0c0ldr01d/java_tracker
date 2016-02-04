@@ -65,9 +65,23 @@ def wnet_disconnect(host):
     win32wnet.WNetCancelConnection2(unc, 0, 0)
 
 
-#Pseudocode follows
-#What I really need to do is say  if exists c:\program files\java  then foreach subdir of same, drop file in that dir\lib\management, same for c:\program files (x86)
-
+def distribute(remote_dir,filename):
+    if os.path.exists(remote_dir):
+            for name in os.listdir(remote_dir):
+                if os.path.isfile(remote_dir + name):
+                    print (remote_dir + name + ": Regular File. Skipping...")
+                    continue
+                destination = remote_dir + name + "\\lib\\management"
+                destinationfile = destination + "\\" + filename
+                if not os.path.exists(destination):
+                    os.makedirs(destination)
+                    print (destination + ": Created")
+                if os.path.exists(destinationfile):
+                    print (destinationfile + ": File exists")
+                else:
+                    shutil.copy(filename, destination)
+                    if os.path.exists(destinationfile):
+                        print (destinationfile + ": File copied successfully")
 
 with open(computers) as f:
     for line in f:
@@ -79,43 +93,7 @@ with open(computers) as f:
             continue
         remote_dir_32 = "\\\\" + host + "\\c$\Program Files (x86)\\Java\\"
         remote_dir_64 = "\\\\" + host + "\\c$\Program Files\\Java\\"
-        if os.path.exists(remote_dir_32):
-            for name in os.listdir(remote_dir_32):
-                if os.path.isfile(remote_dir_32 + "\\" + name):
-                    continue
-                destination = remote_dir_32 + name + "\\lib\\management"
-                destinationfile = destination + "\\" + file_to_copy
-                #result = netcopy(host=host, source=file_to_copy, dest_dir=destination, username=username, password=password, move=False)
-                if not os.path.exists(destination):
-                    os.makedirs(destination)
-                if os.path.exists(destinationfile):
-                    print (destinationfile + ": File exists")
-                else:
-                    shutil.copy(file_to_copy, destination)
-                    if os.path.exists(destinationfile):
-                        print (destinationfile + ": File copied successfully")
-        if os.path.exists(remote_dir_64):
-            for name in os.listdir(remote_dir_64):
-                if os.path.isfile(remote_dir_32 + "\\" + name):
-                    continue
-                destination = remote_dir_64 + name + "\\lib\\management"
-                destinationfile = destination + "\\" + file_to_copy
-                if not os.path.exists(destination):
-                    os.makedirs(destination)
-                if os.path.exists(destinationfile):
-                    print (destinationfile + ": File exists")
-                else:
-                    shutil.copy(file_to_copy, destination)
-                    if os.path.exists(destination + "\\" + file_to_copy):
-                        print (destinationfile + ": File copied successfully")
-
+        distribute(remote_dir_32,file_to_copy)
+        distribute(remote_dir_64,file_to_copy)
 
         wnet_disconnect(host)
-        #time.sleep(1)
-        #m = re.match(r"(\d+)\.(\d+)\.(\d+)\.(\d+)",version)
-        #if m.group(2) == "8":
-        #    remote_dir = "\c$\Program Files (x86)\\Java\\jre" + m.group(1) + "." + m.group(2) + "." + m.group(3) + "_" + m.group(4) + "\\lib\\management"
-        #else:
-        #    remote_dir = "\c$\Program Files (x86)\\Java\\jre" + m.group(2) + "\\lib\\management"
-        #result = netcopy(host=host, source=file_to_copy, dest_dir=remote_dir, username=username, password=password, move=False)
-        #print (host,version,result)
