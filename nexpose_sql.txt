@@ -1,0 +1,3 @@
+SELECT da.host_name AS asset, ds.name AS software, ds.version AS version FROM dim_asset_software das
+   JOIN dim_asset da USING (asset_id)
+   JOIN dim_software ds USING (software_id)
